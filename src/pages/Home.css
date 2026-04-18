@@ -91,20 +91,24 @@
   opacity: 0.8;
 }
 
-.movie-grid-placeholder {
-  height: 400px;
-  background: var(--bg-card);
-  border: 2px dashed rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.movie-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 2rem;
 }
 
-.placeholder-text {
-  color: var(--text-secondary);
-  font-size: 1.2rem;
-  font-style: italic;
+@media (max-width: 1200px) {
+  .movie-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .movie-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+  }
 }
 
 @media (max-width: 768px) {
