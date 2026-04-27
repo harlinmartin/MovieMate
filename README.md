@@ -1,7 +1,7 @@
 # MovieMate 🎬
 
 ## 🔗 Live Demo
-[Your Deployed Link Here - e.g., https://moviemate-mini.vercel.app]
+https://movie-mate-ebon.vercel.app/
 
 ## 📖 Description
 MovieMate is a comprehensive movie and series discovery platform designed for film enthusiasts. It allows users to browse trending content, search for specific titles, and manage a personalized watchlist. Built as a part of the FSD 74 Mini Project, it focuses on delivering a high-quality, responsive user experience with real-time data integration.
@@ -23,7 +23,7 @@ The primary goal of this project was to build a clean, functional React applicat
 - **Styling:** Vanilla CSS3 (Custom Design System with CSS Variables)
 - **APIs:** TMDB (The Movie Database) API
 - **Libraries:** React Router DOM, Axios, React Icons
-- **Deployment:** [Vercel / Netlify]
+- **Deployment:** Vercel 
 
 ## 🚀 Setup Instructions
 
@@ -64,15 +64,3 @@ This application is fully responsive and tested on:
 - **Personalized Palette**: Used a unique "Crimson & Midnight" color scheme to stand out from generic templates.
 - **Context API over Redux**: Chose React Context for the Watchlist to keep the codebase clean and efficient for a mini-project.
 - **Micro-interactions**: Added subtle CSS animations (`fadeIn`, `bounce`) to make the interface feel alive.
-
-👤 **Author**
-[Your Name]
-- GitHub: [@yourusername]
-- LinkedIn: [Your Profile Link]
-
-📄 **License**
-This project is open source and available under the MIT License.
-
-🙏 **Acknowledgments**
-- API provider: [TMDB (The Movie Database)](https://www.themoviedb.org/)
-- Icons: [React Icons / FiIcons]
