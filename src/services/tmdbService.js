@@ -3,6 +3,8 @@ import axios from 'axios';
 const API_KEY = import.meta.env.VITE_TMDB_KEY;
 const BASE_URL = 'https://api.themoviedb.org/3';
 
+// This service handles all our calls to the TheMovieDB API
+// Make sure you have your VITE_TMDB_KEY in the .env file!
 const tmdbApi = axios.create({
   baseURL: BASE_URL,
   params: {
@@ -11,7 +13,7 @@ const tmdbApi = axios.create({
 });
 
 export const tmdbService = {
-  // Get trending movies for the Hero section and Home grid
+  // We use this for the big trending section on the home page
   getTrending: async (type = 'movie', timeWindow = 'day') => {
     try {
       const response = await tmdbApi.get(`/trending/${type}/${timeWindow}`);
@@ -57,6 +59,33 @@ export const tmdbService = {
       return response.data.results;
     } catch (error) {
       console.error('Error searching:', error);
+      throw error;
+    }
+  },
+
+  // Get list of genres
+  getGenres: async (type = 'movie') => {
+    try {
+      const response = await tmdbApi.get(`/genre/${type}/list`);
+      return response.data.genres;
+    } catch (error) {
+      console.error('Error fetching genres:', error);
+      throw error;
+    }
+  },
+
+  // Discover movies/shows by genre
+  getByGenre: async (type = 'movie', genreId, page = 1) => {
+    try {
+      const response = await tmdbApi.get(`/discover/${type}`, {
+        params: { 
+          with_genres: genreId,
+          page
+        }
+      });
+      return response.data.results;
+    } catch (error) {
+      console.error('Error fetching by genre:', error);
       throw error;
     }
   }

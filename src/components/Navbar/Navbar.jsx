@@ -36,7 +36,7 @@ const Navbar = () => {
   return (
     <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
       <div className="navbar-container container">
-        <Link to="/" className="navbar-logo">
+        <Link to="/" className="navbar-logo" aria-label="MovieMate Home">
           MOVIE<span>MATE</span>
         </Link>
 
@@ -44,10 +44,11 @@ const Navbar = () => {
           <input 
             type="text" 
             placeholder="Search movies..." 
+            aria-label="Search movies"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
-          <button type="submit"><FiSearch /></button>
+          <button type="submit" aria-label="Submit search"><FiSearch /></button>
         </form>
 
         <div className={`navbar-links ${isMobileMenuOpen ? 'active' : ''}`}>

@@ -7,20 +7,41 @@ import './Home.css';
 
 const Movies = () => {
   const [movies, setMovies] = useState([]);
+  const [genres, setGenres] = useState([]);
+  const [selectedGenre, setSelectedGenre] = useState('');
   const [loading, setLoading] = useState(true);
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get('search');
 
+  // Load genres on mount
+  useEffect(() => {
+    const fetchGenres = async () => {
+      try {
+        const data = await tmdbService.getGenres('movie');
+        setGenres(data);
+      } catch (err) {
+        console.error("Failed to fetch genres", err);
+      }
+    };
+    fetchGenres();
+  }, []);
+
+  // Fetch movies when search query or selected genre changes
   useEffect(() => {
     const fetchMovies = async () => {
       try {
         setLoading(true);
         let data;
+        
         if (searchQuery) {
           data = await tmdbService.search(searchQuery);
+          setSelectedGenre(''); // Clear genre selection when searching
+        } else if (selectedGenre) {
+          data = await tmdbService.getByGenre('movie', selectedGenre);
         } else {
           data = await tmdbService.getPopular('movie');
         }
+        
         setMovies(data);
       } catch (err) {
         console.error(err);
@@ -29,17 +50,35 @@ const Movies = () => {
       }
     };
     fetchMovies();
-  }, [searchQuery]);
+  }, [searchQuery, selectedGenre]);
 
   return (
     <div className="container section">
       <div className="section-header">
         <h2>{searchQuery ? `Search Results for "${searchQuery}"` : 'Explore Movies'}</h2>
+        
+        {/* Simple Genre Filter - Human style */}
+        {!searchQuery && (
+          <div className="filter-container">
+            <select 
+              value={selectedGenre} 
+              onChange={(e) => setSelectedGenre(e.target.value)}
+              className="genre-select"
+            >
+              <option value="">All Genres</option>
+              {genres.map(genre => (
+                <option key={genre.id} value={genre.id}>
+                  {genre.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
       
       {movies.length === 0 && !loading ? (
         <div className="no-results">
-          <h3>No movies found for "{searchQuery}"</h3>
+          <h3>No movies found</h3>
         </div>
       ) : (
         <div className="movie-grid">

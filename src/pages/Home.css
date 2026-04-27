@@ -69,8 +69,36 @@
 .section-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-end;
   margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.filter-container {
+  display: flex;
+  align-items: center;
+}
+
+.genre-select {
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.genre-select:hover {
+  border-color: var(--accent-light);
+}
+
+.genre-select:focus {
+  border-color: var(--accent-color);
 }
 
 .section-header h2 {

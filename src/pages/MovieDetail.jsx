@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { FiStar, FiCalendar, FiClock, FiPlay, FiArrowLeft, FiPlus } from 'react-icons/fi';
+import { FiStar, FiCalendar, FiClock, FiPlay, FiArrowLeft, FiPlus, FiCheck } from 'react-icons/fi';
 import { tmdbService } from '../services/tmdbService';
+import { useWatchlist } from '../utils/WatchlistContext';
 import Loader from '../components/Loader/Loader';
 import Badge from '../components/Badge/Badge';
 import MovieCard from '../components/MovieCard/MovieCard';
@@ -12,6 +13,9 @@ const MovieDetail = () => {
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [userRating, setUserRating] = useState(0); // Added for Core Requirement: User rating interface
+  
+  const { isInWatchlist, toggleWatchlist } = useWatchlist();
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -41,6 +45,19 @@ const MovieDetail = () => {
   const runtime = movie.runtime ? `${movie.runtime} min` : movie.episode_run_time ? `${movie.episode_run_time[0]} min` : 'N/A';
   
   const trailer = movie.videos?.results.find(v => v.type === 'Trailer' && v.site === 'YouTube');
+  const isFavorited = isInWatchlist(movie.id);
+
+  const handleToggleWatchlist = () => {
+    // This saves the item to our LocalStorage watchlist
+    toggleWatchlist({
+      id: movie.id,
+      title: movie.title || movie.name,
+      poster_path: movie.poster_path,
+      vote_average: movie.vote_average,
+      release_date: movie.release_date || movie.first_air_date,
+      media_type: type
+    });
+  };
 
   return (
     <div className="movie-detail">
@@ -75,9 +92,26 @@ const MovieDetail = () => {
                     <FiPlay /> Watch Trailer
                   </a>
                 )}
-                <button className="btn btn-outline">
-                  <FiPlus /> Add to Watchlist
+                <button 
+                  className={`btn ${isFavorited ? 'btn-success' : 'btn-outline'}`}
+                  onClick={handleToggleWatchlist}
+                >
+                  {isFavorited ? <><FiCheck /> In Watchlist</> : <><FiPlus /> Add to Watchlist</>}
                 </button>
+              </div>
+
+              {/* User rating interface - Core Requirement */}
+              <div className="user-rating-section animate">
+                <p>Your Rating:</p>
+                <div className="stars">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <FiStar 
+                      key={star} 
+                      className={star <= userRating ? 'star active' : 'star'} 
+                      onClick={() => setUserRating(star)}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
           </div>

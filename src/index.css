@@ -1,14 +1,15 @@
 :root {
-  --primary: #e50914;
-  --secondary: #221f1f;
-  --bg-dark: #0f0f0f;
-  --bg-card: #1a1a1a;
-  --text-primary: #ffffff;
-  --text-secondary: #b3b3b3;
-  --accent: #f5c518;
-  --glass: rgba(255, 255, 255, 0.05);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --primary: #ff3e3e; /* A brighter, more energetic red */
+  --secondary: #1a1818;
+  --bg-dark: #080707; /* Deeper black */
+  --bg-card: #151414;
+  --text-primary: #f8f9fa;
+  --text-secondary: #9ea7af;
+  --accent: #ffd700; /* Richer Gold */
+  --accent-light: #ffba08;
+  --glass: rgba(20, 20, 20, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Added some "bounce" to transitions */
 }
 
 * {

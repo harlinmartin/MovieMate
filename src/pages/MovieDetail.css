@@ -110,6 +110,40 @@
 .detail-actions {
   display: flex;
   gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.user-rating-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-rating-section p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.stars {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.star {
+  font-size: 1.5rem;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.star:hover {
+  transform: scale(1.2);
+  color: var(--accent-light);
+}
+
+.star.active {
+  color: var(--accent-color);
+  fill: var(--accent-color);
 }
 
 .detail-content {
