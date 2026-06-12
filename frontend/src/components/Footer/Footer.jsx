@@ -33,7 +33,7 @@ const Footer = () => {
       
       <div className="footer-bottom">
         <div className="container">
-          <p>&copy; {currentYear} MovieMate. Built with ❤️ for the Mini Project.</p>
+          <p>&copy; {currentYear} MovieMate.</p>
         </div>
       </div>
     </footer>
