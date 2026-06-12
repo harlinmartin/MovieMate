@@ -3,6 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import { FiStar, FiCalendar, FiClock, FiPlay, FiArrowLeft, FiPlus, FiCheck } from 'react-icons/fi';
 import { tmdbService } from '../services/tmdbService';
 import { useWatchlist } from '../utils/WatchlistContext';
+import { useAuth } from '../utils/AuthContext';
+import api from '../services/api';
 import Loader from '../components/Loader/Loader';
 import Badge from '../components/Badge/Badge';
 import MovieCard from '../components/MovieCard/MovieCard';
@@ -13,10 +15,13 @@ const MovieDetail = () => {
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [userRating, setUserRating] = useState(0); // Added for Core Requirement: User rating interface
+  const [userRating, setUserRating] = useState(0);
+  const [ratingLoading, setRatingLoading] = useState(false);
   
   const { isInWatchlist, toggleWatchlist } = useWatchlist();
+  const { isAuthenticated } = useAuth();
 
+  // Fetch movie details from TMDB
   useEffect(() => {
     const fetchDetails = async () => {
       try {
@@ -34,6 +39,47 @@ const MovieDetail = () => {
     window.scrollTo(0, 0);
   }, [type, id]);
 
+  // Fetch user's rating from our backend (if logged in)
+  useEffect(() => {
+    const fetchRating = async () => {
+      if (!isAuthenticated || !id) return;
+      
+      try {
+        const res = await api.get(`/ratings/${id}`);
+        if (res.data.rating !== null) {
+          setUserRating(res.data.rating);
+        } else {
+          setUserRating(0);
+        }
+      } catch (error) {
+        console.error('Error fetching rating:', error);
+      }
+    };
+
+    fetchRating();
+  }, [id, isAuthenticated]);
+
+  // Handle star click — save rating to backend
+  const handleRating = async (star) => {
+    if (!isAuthenticated) return;
+
+    try {
+      setRatingLoading(true);
+      setUserRating(star); // Optimistic update
+
+      await api.put('/ratings', {
+        tmdbId: Number(id),
+        mediaType: type,
+        rating: star,
+      });
+    } catch (error) {
+      console.error('Error saving rating:', error);
+      setUserRating(0); // Revert on error
+    } finally {
+      setRatingLoading(false);
+    }
+  };
+
   if (loading) return <Loader fullPage />;
   if (error) return <div className="container error-page"><h2>{error}</h2><Link to="/">Go Home</Link></div>;
   if (!movie) return null;
@@ -48,7 +94,8 @@ const MovieDetail = () => {
   const isFavorited = isInWatchlist(movie.id);
 
   const handleToggleWatchlist = () => {
-    // This saves the item to our LocalStorage watchlist
+    if (!isAuthenticated) return;
+    // This saves the item to our MongoDB watchlist
     toggleWatchlist({
       id: movie.id,
       title: movie.title || movie.name,
@@ -92,26 +139,41 @@ const MovieDetail = () => {
                     <FiPlay /> Watch Trailer
                   </a>
                 )}
-                <button 
-                  className={`btn ${isFavorited ? 'btn-success' : 'btn-outline'}`}
-                  onClick={handleToggleWatchlist}
-                >
-                  {isFavorited ? <><FiCheck /> In Watchlist</> : <><FiPlus /> Add to Watchlist</>}
-                </button>
+                {isAuthenticated ? (
+                  <button 
+                    className={`btn ${isFavorited ? 'btn-success' : 'btn-outline'}`}
+                    onClick={handleToggleWatchlist}
+                  >
+                    {isFavorited ? <><FiCheck /> In Watchlist</> : <><FiPlus /> Add to Watchlist</>}
+                  </button>
+                ) : (
+                  <Link to="/login" className="btn btn-outline">
+                    <FiPlus /> Login to Save
+                  </Link>
+                )}
               </div>
 
-              {/* User rating interface - Core Requirement */}
+              {/* User rating interface - persisted via backend */}
               <div className="user-rating-section animate">
-                <p>Your Rating:</p>
-                <div className="stars">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <FiStar 
-                      key={star} 
-                      className={star <= userRating ? 'star active' : 'star'} 
-                      onClick={() => setUserRating(star)}
-                    />
-                  ))}
-                </div>
+                {isAuthenticated ? (
+                  <>
+                    <p>Your Rating:</p>
+                    <div className="stars">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <FiStar 
+                          key={star} 
+                          className={star <= userRating ? 'star active' : 'star'} 
+                          onClick={() => handleRating(star)}
+                          style={{ opacity: ratingLoading ? 0.5 : 1 }}
+                        />
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <p className="login-prompt">
+                    <Link to="/login">Login</Link> to rate this {type === 'tv' ? 'show' : 'movie'}
+                  </p>
+                )}
               </div>
             </div>
           </div>

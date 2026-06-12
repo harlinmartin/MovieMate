@@ -1,53 +1,83 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
+import api from '../services/api';
+import { useAuth } from './AuthContext';
 
 const WatchlistContext = createContext();
 
 export const WatchlistProvider = ({ children }) => {
   const [watchlist, setWatchlist] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const { isAuthenticated } = useAuth();
 
-  // Load watchlist from localStorage on startup
-  useEffect(() => {
-    const savedWatchlist = localStorage.getItem('moviemate_watchlist');
-    if (savedWatchlist) {
-      try {
-        setWatchlist(JSON.parse(savedWatchlist));
-      } catch (e) {
-        console.error("Error parsing watchlist from local storage", e);
-        setWatchlist([]);
-      }
+  // Fetch watchlist from backend when user is authenticated
+  const fetchWatchlist = useCallback(async () => {
+    if (!isAuthenticated) {
+      setWatchlist([]);
+      return;
     }
-  }, []);
 
-  // Save to localStorage whenever watchlist changes
+    try {
+      setLoading(true);
+      const res = await api.get('/watchlist');
+      setWatchlist(res.data.watchlist);
+    } catch (error) {
+      console.error('Error fetching watchlist:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [isAuthenticated]);
+
+  // Reload watchlist when auth state changes
   useEffect(() => {
-    localStorage.setItem('moviemate_watchlist', JSON.stringify(watchlist));
-  }, [watchlist]);
+    fetchWatchlist();
+  }, [fetchWatchlist]);
 
-  const addToWatchlist = (item) => {
-    if (!watchlist.find(i => i.id === item.id)) {
-      // We store the basic info needed to render a card
-      setWatchlist(prev => [...prev, item]);
+  const addToWatchlist = async (item) => {
+    if (!isAuthenticated) return;
+
+    try {
+      await api.post('/watchlist', {
+        tmdbId: item.id,
+        mediaType: item.media_type || 'movie',
+        title: item.title || item.name,
+        posterPath: item.poster_path,
+        voteAverage: item.vote_average,
+        releaseDate: item.release_date || item.first_air_date,
+      });
+
+      // Refresh the list from backend to stay in sync
+      await fetchWatchlist();
+    } catch (error) {
+      console.error('Error adding to watchlist:', error);
     }
   };
 
-  const removeFromWatchlist = (id) => {
-    setWatchlist(prev => prev.filter(item => item.id !== id));
+  const removeFromWatchlist = async (tmdbId) => {
+    if (!isAuthenticated) return;
+
+    try {
+      await api.delete(`/watchlist/${tmdbId}`);
+      // Remove from local state immediately for snappy UI
+      setWatchlist(prev => prev.filter(item => item.tmdbId !== tmdbId));
+    } catch (error) {
+      console.error('Error removing from watchlist:', error);
+    }
   };
 
   const isInWatchlist = (id) => {
-    return watchlist.some(item => item.id === id);
+    return watchlist.some(item => item.tmdbId === id);
   };
 
-  const toggleWatchlist = (item) => {
+  const toggleWatchlist = async (item) => {
     if (isInWatchlist(item.id)) {
-      removeFromWatchlist(item.id);
+      await removeFromWatchlist(item.id);
     } else {
-      addToWatchlist(item);
+      await addToWatchlist(item);
     }
   };
 
   return (
-    <WatchlistContext.Provider value={{ watchlist, addToWatchlist, removeFromWatchlist, isInWatchlist, toggleWatchlist }}>
+    <WatchlistContext.Provider value={{ watchlist, loading, addToWatchlist, removeFromWatchlist, isInWatchlist, toggleWatchlist }}>
       {children}
     </WatchlistContext.Provider>
   );
