@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { FiSearch, FiBookmark, FiHome, FiFilm, FiTv, FiMenu, FiX } from 'react-icons/fi';
+import { FiSearch, FiBookmark, FiHome, FiFilm, FiTv, FiMenu, FiX, FiLogIn, FiLogOut, FiUser } from 'react-icons/fi';
+import { useAuth } from '../../utils/AuthContext';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -9,6 +10,7 @@ const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
+  const { user, isAuthenticated, logout } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,6 +26,12 @@ const Navbar = () => {
       navigate(`/movies?search=${searchQuery}`);
       setSearchQuery('');
     }
+  };
+
+  const handleLogout = () => {
+    logout();
+    setIsMobileMenuOpen(false);
+    navigate('/');
   };
 
   const navLinks = [
@@ -63,6 +71,29 @@ const Navbar = () => {
               {link.name}
             </Link>
           ))}
+
+          {/* Auth section */}
+          {isAuthenticated ? (
+            <div className="nav-auth">
+              <span className="nav-user">
+                <FiUser />
+                {user?.name?.split(' ')[0]}
+              </span>
+              <button className="nav-link logout-btn" onClick={handleLogout}>
+                <span className="nav-icon"><FiLogOut /></span>
+                Logout
+              </button>
+            </div>
+          ) : (
+            <Link 
+              to="/login" 
+              className={`nav-link login-link ${location.pathname === '/login' ? 'active' : ''}`}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <span className="nav-icon"><FiLogIn /></span>
+              Login
+            </Link>
+          )}
         </div>
 
         <button 
