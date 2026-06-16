@@ -1,7 +1,7 @@
 # MovieMate 🎬
 
 ## 🔗 Live Demo
-https://movie-mate-ebon.vercel.app/
+https://movie-mate-9hho.vercel.app/
 
 ## 📖 Description
 MovieMate is a comprehensive movie and series discovery platform designed for film enthusiasts. It allows users to browse trending content, search for specific titles, and manage a personalized watchlist. Built as a part of the FSD 74 Mini Project, it focuses on delivering a high-quality, responsive user experience with real-time data integration.
